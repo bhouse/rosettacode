@@ -10,6 +10,7 @@ class RosettaCode24
   def run
     print_prompt
     get_user_input
+    verify_equation_uses_each_number
     calculate_total
     print_total
     print_result
@@ -46,6 +47,13 @@ class RosettaCode24
       $stdout.puts 'WINNER'
     else
       $stdout.puts 'LOSER'
+    end
+  end
+
+  def verify_equation_uses_each_number
+    user_numbers = equation.scan(/\d+/).map(&:to_i).sort
+    unless user_numbers == numbers.sort
+      $stderr.puts "Error: Invalid equation, you must use each number once."
     end
   end
 end

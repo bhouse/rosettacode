@@ -11,9 +11,11 @@ describe RosettaCode24 do
   end
 
   describe '#run' do
-    subject { described_class.new }
     let(:numbers) { [1, 2, 3, 4] }
+    subject { described_class.new }
+
     before(:each) do
+      subject.numbers = numbers
       allow($stdin).to receive(:gets).and_return(numbers.join("+") + "\n")
     end
 
@@ -26,8 +28,26 @@ describe RosettaCode24 do
     end
 
     it 'outputs the total' do
-      subject.numbers = numbers
       expect { subject.run }.to output(/Total: #{numbers.inject(0, :+)}/).to_stdout
+    end
+
+    context 'the user enters an equation without using each random number' do
+      let(:missing_number_equation) { "1 + 2 + 5 + 4\n" }
+      before do
+        # Mask stdout, we are only looking for errors in this context
+        @original_stdout = $stdout
+        $stdout = File.open(File::NULL, 'w')
+        subject.numbers = numbers
+        allow($stdin).to receive(:gets).and_return(missing_number_equation)
+      end
+
+      after do
+        $stdout = @original_stdout
+      end
+
+      it 'exits' do
+        expect { subject.run }.to output("Error: Invalid equation, you must use each number once.\n").to_stderr
+      end
     end
   end
 end
